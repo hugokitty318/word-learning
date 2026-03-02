@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -65,7 +65,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* 統計與模式切換 - 簡化版 */
+        /* 統計與模式切換 */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -108,7 +108,7 @@
             color: white;
         }
 
-        /* 輸入區域 - 簡化版 */
+        /* 輸入區域 */
         .input-section {
             background: linear-gradient(145deg, #ffffff, #fff0f5);
             border-radius: 20px;
@@ -172,8 +172,12 @@
         }
 
         .input-group textarea {
-            min-height: 80px;
-            resize: none;
+            width: 100%;
+            height: 160px;
+            flex: none;
+            resize: vertical;
+            line-height: 1.8;
+            font-size: 1.1em;
         }
 
         .input-group input:focus,
@@ -218,17 +222,23 @@
             color: white;
         }
 
+        .btn-speak {
+            background: linear-gradient(145deg, #9c27b0, #7b1fa2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+        }
+
         .btn-small {
             padding: 10px 14px;
             font-size: 0.9em;
             border-radius: 12px;
         }
 
-        /* 隨機展示區域 - iOS 優化大按鈕 */
+        /* 隨機展示區域 */
         .random-display {
             display: none;
             text-align: center;
-            padding: 30px 20px;
+            padding: 25px 20px;
             background: linear-gradient(145deg, #ffffff, #fff0f5);
             border-radius: 25px;
             border: 3px solid #ffb6c1;
@@ -247,11 +257,16 @@
             to { opacity: 1; transform: scale(1); }
         }
 
+        .random-word-container {
+            position: relative;
+            display: inline-block;
+        }
+
         .random-word {
             font-size: 4.5em;
             color: #ff1493;
             text-shadow: 2px 2px 5px rgba(255, 105, 180, 0.3);
-            margin: 25px 0;
+            margin: 20px 0;
             animation: bounce 1.5s ease-in-out infinite;
             min-height: 100px;
             display: flex;
@@ -259,16 +274,39 @@
             justify-content: center;
         }
 
+        .speak-btn-large {
+            position: absolute;
+            right: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(145deg, #9c27b0, #7b1fa2);
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(156, 39, 176, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .speak-btn-large:active {
+            transform: translateY(-50%) scale(0.9);
+        }
+
+
+
         .random-controls {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             justify-content: center;
             flex-wrap: wrap;
         }
 
         .random-controls .btn {
-            padding: 18px 30px;
-            font-size: 1.1em;
+            padding: 16px 25px;
+            font-size: 1em;
         }
 
         .swipe-hint {
@@ -278,7 +316,7 @@
             opacity: 0.8;
         }
 
-        /* 卡片區域 - 滑動優化 */
+        /* 卡片區域 */
         .cards-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
@@ -311,16 +349,23 @@
         }
 
         .word-text {
-            font-size: 2em;
+            font-size: 1.8em;
             color: #e91e8c;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             font-weight: bold;
         }
+
+
 
         .card-actions {
             display: flex;
             justify-content: center;
-            gap: 6px;
+            gap: 5px;
+        }
+
+        .card-actions .btn-small {
+            padding: 8px 10px;
+            font-size: 0.85em;
         }
 
         /* 空狀態 */
@@ -445,11 +490,17 @@
             }
 
             .word-text {
-                font-size: 1.7em;
+                font-size: 1.5em;
             }
 
             .random-word {
                 font-size: 3.5em;
+            }
+
+            .speak-btn-large {
+                position: static;
+                transform: none;
+                margin-top: 10px;
             }
 
             .top-bar {
@@ -471,6 +522,8 @@
             margin-bottom: 12px;
             opacity: 0.7;
         }
+
+
     </style>
 </head>
 <body>
@@ -497,8 +550,8 @@
         <!-- 輸入區域 -->
         <div class="input-section">
             <div class="input-tabs">
-                <button class="input-tab active" onclick="setInputTab('single')">➕ 單個新增</button>
-                <button class="input-tab" onclick="setInputTab('batch')">📝 批量新增</button>
+                <button class="input-tab active" onclick="setInputTab('single')">單個新增</button>
+                <button class="input-tab" onclick="setInputTab('batch')">批量新增</button>
             </div>
 
             <!-- 單個輸入 -->
@@ -511,16 +564,19 @@
 
             <!-- 批量輸入 -->
             <div class="input-panel" id="batchPanel">
-                <textarea id="batchInput" placeholder="每行一個字詞，或用逗號分隔&#10;例如：&#10;蘋果&#10;香蕉&#10;草莓&#10;或：蘋果,香蕉,草莓"></textarea>
+                <textarea id="batchInput" placeholder="輸入多個字詞..."></textarea>
                 <div style="margin-top: 10px;">
-                    <button class="btn btn-primary" onclick="addBatchWords()" style="width: 100%;">✨ 批量新增</button>
+                    <button class="btn btn-primary" onclick="addBatchWords()" style="width: 100%;">新增</button>
                 </div>
             </div>
         </div>
 
         <!-- 隨機展示區域 -->
         <div class="random-display" id="randomDisplay">
-            <div class="random-word" id="randomWord">-</div>
+            <div class="random-word-container">
+                <div class="random-word" id="randomWord">-</div>
+                <button class="speak-btn-large" onclick="speakCurrentWord()" title="廣東話讀音">🔊</button>
+            </div>
             <div class="random-controls">
                 <button class="btn btn-secondary" onclick="prevRandom()">⬅️ 上個</button>
                 <button class="btn btn-primary" onclick="nextRandom()">下個 ➡️</button>
@@ -529,13 +585,15 @@
         </div>
 
         <!-- 卡片區域 -->
-        <p class="quick-hint" id="quickHint">💡 點擊卡片可編輯，長按可刪除</p>
+        <p class="quick-hint" id="quickHint">💡 點擊卡片可編輯，長按可刪除，🔊可讀音</p>
         <div class="cards-container" id="cardsContainer">
             <div class="empty-state">
                 <div class="icon">🎈</div>
                 <p>還沒有生字喔～<br>快來新增吧！</p>
             </div>
         </div>
+
+
     </div>
 
     <!-- 編輯模態框 -->
@@ -568,6 +626,7 @@
     <script>
         // 資料存儲
         let words = JSON.parse(localStorage.getItem('learningWords')) || [];
+        let wordStats = JSON.parse(localStorage.getItem('wordStats')) || {}; // { word: count }
         let currentMode = 'manual';
         let editingIndex = -1;
         let deletingIndex = -1;
@@ -626,7 +685,9 @@
             }
 
             words.push(word);
+            wordStats[word] = 0; // 初始化展示次數
             saveWords();
+            saveWordStats();
             input.value = '';
             renderCards();
             updateStats();
@@ -659,6 +720,7 @@
             newWords.forEach(word => {
                 if (!words.includes(word)) {
                     words.push(word);
+                    wordStats[word] = 0; // 初始化展示次數
                     added++;
                 } else {
                     duplicates++;
@@ -666,6 +728,7 @@
             });
 
             saveWords();
+            saveWordStats();
             textarea.value = '';
             renderCards();
             updateStats();
@@ -725,34 +788,111 @@
             }
         }
 
+        // 加權隨機選擇演算法
+        function weightedRandomSelect() {
+            if (words.length === 0) return -1;
+            if (words.length === 1) return 0;
+
+            // 計算每個字詞的權重（展示次數越少，權重越高）
+            const weights = words.map(word => {
+                const count = wordStats[word] || 0;
+                return 1 / (count + 1); // 權重 = 1 / (次數 + 1)
+            });
+
+            // 計算總權重
+            const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+
+            // 隨機選擇
+            let random = Math.random() * totalWeight;
+            
+            for (let i = 0; i < weights.length; i++) {
+                random -= weights[i];
+                if (random <= 0) {
+                    return i;
+                }
+            }
+
+            return words.length - 1;
+        }
+
         // 隨機導航
         function nextRandom() {
             if (words.length === 0) {
                 document.getElementById('randomWord').textContent = '無生字';
+                currentRandomIndex = -1;
                 return;
             }
 
-            if (words.length === 1) {
-                currentRandomIndex = 0;
-            } else {
-                let newIndex;
-                do {
-                    newIndex = Math.floor(Math.random() * words.length);
-                } while (newIndex === currentRandomIndex);
-                currentRandomIndex = newIndex;
-            }
+            // 使用加權隨機
+            currentRandomIndex = weightedRandomSelect();
+            const word = words[currentRandomIndex];
 
-            document.getElementById('randomWord').textContent = words[currentRandomIndex];
+            // 更新展示次數
+            wordStats[word] = (wordStats[word] || 0) + 1;
+            saveWordStats();
+
+            // 顯示
+            document.getElementById('randomWord').textContent = word;
         }
 
         function prevRandom() {
             if (words.length === 0) {
                 document.getElementById('randomWord').textContent = '無生字';
+                currentRandomIndex = -1;
                 return;
             }
 
-            currentRandomIndex = (currentRandomIndex - 1 + words.length) % words.length;
-            document.getElementById('randomWord').textContent = words[currentRandomIndex];
+            // 如果還沒開始，從第一個開始
+            if (currentRandomIndex < 0) {
+                currentRandomIndex = 0;
+            } else {
+                currentRandomIndex = (currentRandomIndex - 1 + words.length) % words.length;
+            }
+            const word = words[currentRandomIndex];
+
+            document.getElementById('randomWord').textContent = word;
+        }
+
+        // 廣東話讀音功能
+        function speakWord(word) {
+            if (!word) return;
+
+            // 檢查瀏覽器支援
+            if (!('speechSynthesis' in window)) {
+                showToast('⚠️ 此瀏覽器不支援語音功能');
+                return;
+            }
+
+            // 停止之前的語音
+            speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = 'zh-HK'; // 廣東話
+            utterance.rate = 0.8; // 稍慢一點，適合小朋友
+            utterance.pitch = 1.1; // 稍高一點的音調
+
+            // 嘗試找到廣東話聲音
+            const voices = speechSynthesis.getVoices();
+            const cantoneseVoice = voices.find(v => v.lang.includes('zh-HK') || v.lang.includes('zh_HK'));
+            if (cantoneseVoice) {
+                utterance.voice = cantoneseVoice;
+            }
+
+            speechSynthesis.speak(utterance);
+        }
+
+        function speakCurrentWord() {
+            const word = document.getElementById('randomWord').textContent;
+            if (word && word !== '-' && word !== '無生字') {
+                speakWord(word);
+            }
+        }
+
+        // 確保語音列表載入
+        if ('speechSynthesis' in window) {
+            speechSynthesis.onvoiceschanged = () => {
+                speechSynthesis.getVoices();
+            };
         }
 
         // 渲染卡片
@@ -766,18 +906,24 @@
                         <p>還沒有生字喔～<br>快來新增吧！</p>
                     </div>
                 `;
+
                 return;
             }
 
-            container.innerHTML = words.map((word, index) => `
+
+
+            container.innerHTML = words.map((word, index) => {
+                const safeWord = word.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                return `
                 <div class="word-card" data-index="${index}" onclick="openEditModal(${index})">
                     <div class="word-text">${word}</div>
                     <div class="card-actions">
+                        <button class="btn btn-speak btn-small" onclick="event.stopPropagation(); speakWord('${safeWord}')">🔊</button>
                         <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); openEditModal(${index})">✏️</button>
                         <button class="btn btn-danger btn-small" onclick="event.stopPropagation(); openDeleteModal(${index})">🗑️</button>
                     </div>
                 </div>
-            `).join('');
+            `;}).join('');
 
             // 添加長按刪除功能
             document.querySelectorAll('.word-card').forEach(card => {
@@ -809,6 +955,12 @@
             localStorage.setItem('learningWords', JSON.stringify(words));
         }
 
+        function saveWordStats() {
+            localStorage.setItem('wordStats', JSON.stringify(wordStats));
+        }
+
+
+
         // 編輯相關
         function openEditModal(index) {
             editingIndex = index;
@@ -835,8 +987,16 @@
                 return;
             }
 
+            const oldWord = words[editingIndex];
+            const oldCount = wordStats[oldWord] || 0;
+
+            // 更新字詞和統計
             words[editingIndex] = newWord;
+            delete wordStats[oldWord];
+            wordStats[newWord] = oldCount;
+
             saveWords();
+            saveWordStats();
             renderCards();
             closeEditModal();
             showToast('✅ 編輯成功！');
@@ -855,8 +1015,12 @@
         }
 
         function confirmDelete() {
+            const word = words[deletingIndex];
             words.splice(deletingIndex, 1);
+            delete wordStats[word];
+
             saveWords();
+            saveWordStats();
             renderCards();
             updateStats();
             closeDeleteModal();
