@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="pink-translucent">
+    <meta name="apple-mobile-web-app-title" content="字詞學習">
+    <meta name="theme-color" content="#ffeef8">
+    <title>🌸 小公主字詞學習 🌸</title>
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Comic Sans MS', '微軟正黑體', cursive, sans-serif;
+            background: linear-gradient(135deg, #ffeef8 0%, #fff5f8 50%, #ffe4ec 100%);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            padding: 15px;
+            padding-bottom: env(safe-area-inset-bottom, 15px);
+            overscroll-behavior: none;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 標題區域 */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            color: #e91e8c;
+            text-shadow: 2px 2px 4px rgba(255, 182, 193, 0.5);
+        }
+
+        .decoration {
+            font-size: 1.5em;
+            margin: 5px;
+            display: inline-block;
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 統計與模式切換 - 簡化版 */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stats {
+            color: #e91e8c;
+            font-size: 1em;
+            background: rgba(255,255,255,0.7);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .mode-toggle {
+            display: flex;
+            background: white;
+            border-radius: 25px;
+            padding: 4px;
+            box-shadow: 0 2px 10px rgba(255, 105, 180, 0.2);
+        }
+
+        .mode-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 20px;
+            background: transparent;
+            color: #ff69b4;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(145deg, #ff69b4, #ff1493);
+            color: white;
+        }
+
+        /* 輸入區域 - 簡化版 */
+        .input-section {
+            background: linear-gradient(145deg, #ffffff, #fff0f5);
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.15);
+            border: 2px solid #ffb6c1;
+        }
+
+        .input-tabs {
+            display: flex;
+            margin-bottom: 12px;
+            background: #fff5f8;
+            border-radius: 15px;
+            padding: 3px;
+        }
+
+        .input-tab {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            background: transparent;
+            color: #ff69b4;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .input-tab.active {
+            background: white;
+            color: #e91e8c;
+            box-shadow: 0 2px 8px rgba(255, 105, 180, 0.2);
+        }
+
+        .input-panel {
+            display: none;
+        }
+
+        .input-panel.active {
+            display: block;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid #ffb6c1;
+            border-radius: 15px;
+            font-size: 1.1em;
+            outline: none;
+            transition: all 0.3s ease;
+            background: white;
+            font-family: inherit;
+        }
+
+        .input-group textarea {
+            min-height: 80px;
+            resize: none;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            border-color: #ff69b4;
+            box-shadow: 0 0 12px rgba(255, 105, 180, 0.2);
+        }
+
+        .input-group input::placeholder,
+        .input-group textarea::placeholder {
+            color: #ffc0cb;
+        }
+
+        .btn {
+            padding: 14px 22px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-primary {
+            background: linear-gradient(145deg, #ff69b4, #ff1493);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(145deg, #87ceeb, #6bb3d9);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(145deg, #ff6b6b, #ee5a5a);
+            color: white;
+        }
+
+        .btn-small {
+            padding: 10px 14px;
+            font-size: 0.9em;
+            border-radius: 12px;
+        }
+
+        /* 隨機展示區域 - iOS 優化大按鈕 */
+        .random-display {
+            display: none;
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(145deg, #ffffff, #fff0f5);
+            border-radius: 25px;
+            border: 3px solid #ffb6c1;
+            box-shadow: 0 8px 30px rgba(255, 105, 180, 0.2);
+            margin-bottom: 15px;
+            touch-action: pan-y;
+        }
+
+        .random-display.show {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .random-word {
+            font-size: 4.5em;
+            color: #ff1493;
+            text-shadow: 2px 2px 5px rgba(255, 105, 180, 0.3);
+            margin: 25px 0;
+            animation: bounce 1.5s ease-in-out infinite;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .random-controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .random-controls .btn {
+            padding: 18px 30px;
+            font-size: 1.1em;
+        }
+
+        .swipe-hint {
+            color: #ff69b4;
+            font-size: 0.85em;
+            margin-top: 15px;
+            opacity: 0.8;
+        }
+
+        /* 卡片區域 - 滑動優化 */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+        }
+
+        .word-card {
+            background: linear-gradient(145deg, #ffffff, #fff8fa);
+            border-radius: 18px;
+            padding: 18px 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.12);
+            border: 2px solid #ffc0cb;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .word-card::before {
+            content: '✨';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 0.7em;
+            opacity: 0.6;
+        }
+
+        .word-card:active {
+            transform: scale(0.97);
+        }
+
+        .word-text {
+            font-size: 2em;
+            color: #e91e8c;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* 空狀態 */
+        .empty-state {
+            text-align: center;
+            padding: 40px 15px;
+            color: #ff69b4;
+            grid-column: 1 / -1;
+        }
+
+        .empty-state .icon {
+            font-size: 3.5em;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        /* 模態框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 182, 193, 0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #ffffff, #fff0f5);
+            padding: 25px;
+            border-radius: 20px;
+            border: 3px solid #ff69b4;
+            box-shadow: 0 12px 40px rgba(255, 20, 147, 0.3);
+            max-width: 90%;
+            width: 320px;
+            animation: popIn 0.25s ease;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-content h3 {
+            color: #e91e8c;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #ffb6c1;
+            border-radius: 12px;
+            font-size: 1.1em;
+            margin-bottom: 18px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .modal-content input:focus {
+            border-color: #ff69b4;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .confirm-modal p {
+            color: #e91e8c;
+            font-size: 1.05em;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+
+        /* 提示訊息 */
+        .toast {
+            position: fixed;
+            bottom: calc(env(safe-area-inset-bottom, 20px) + 20px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(145deg, #ff69b4, #ff1493);
+            color: white;
+            padding: 14px 25px;
+            border-radius: 25px;
+            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.4);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 2000;
+            font-size: 0.95em;
+            text-align: center;
+            max-width: 85%;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 400px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .word-text {
+                font-size: 1.7em;
+            }
+
+            .random-word {
+                font-size: 3.5em;
+            }
+
+            .top-bar {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .mode-toggle {
+                justify-content: center;
+            }
+        }
+
+        /* 快速操作提示 */
+        .quick-hint {
+            text-align: center;
+            color: #ff69b4;
+            font-size: 0.85em;
+            margin-bottom: 12px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 標題區域 -->
+        <div class="header">
+            <div>
+                <span class="decoration">🌸</span>
+                <span class="decoration" style="animation-delay: 0.5s;">🦋</span>
+                <span class="decoration" style="animation-delay: 1s;">🌸</span>
+            </div>
+            <h1>小公主字詞學習</h1>
+        </div>
+
+        <!-- 頂部工具列 -->
+        <div class="top-bar">
+            <div class="stats">📚 共 <strong id="wordCount">0</strong> 個生字</div>
+            <div class="mode-toggle">
+                <button class="mode-btn active" id="manualMode" onclick="setMode('manual')">📋 手動</button>
+                <button class="mode-btn" id="randomMode" onclick="setMode('random')">🎲 隨機</button>
+            </div>
+        </div>
+
+        <!-- 輸入區域 -->
+        <div class="input-section">
+            <div class="input-tabs">
+                <button class="input-tab active" onclick="setInputTab('single')">➕ 單個新增</button>
+                <button class="input-tab" onclick="setInputTab('batch')">📝 批量新增</button>
+            </div>
+
+            <!-- 單個輸入 -->
+            <div class="input-panel active" id="singlePanel">
+                <div class="input-group">
+                    <input type="text" id="wordInput" placeholder="輸入字詞..." maxlength="20">
+                    <button class="btn btn-primary" onclick="addWord()">新增</button>
+                </div>
+            </div>
+
+            <!-- 批量輸入 -->
+            <div class="input-panel" id="batchPanel">
+                <textarea id="batchInput" placeholder="每行一個字詞，或用逗號分隔&#10;例如：&#10;蘋果&#10;香蕉&#10;草莓&#10;或：蘋果,香蕉,草莓"></textarea>
+                <div style="margin-top: 10px;">
+                    <button class="btn btn-primary" onclick="addBatchWords()" style="width: 100%;">✨ 批量新增</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 隨機展示區域 -->
+        <div class="random-display" id="randomDisplay">
+            <div class="random-word" id="randomWord">-</div>
+            <div class="random-controls">
+                <button class="btn btn-secondary" onclick="prevRandom()">⬅️ 上個</button>
+                <button class="btn btn-primary" onclick="nextRandom()">下個 ➡️</button>
+            </div>
+            <div class="swipe-hint">💡 左右滑動切換生字</div>
+        </div>
+
+        <!-- 卡片區域 -->
+        <p class="quick-hint" id="quickHint">💡 點擊卡片可編輯，長按可刪除</p>
+        <div class="cards-container" id="cardsContainer">
+            <div class="empty-state">
+                <div class="icon">🎈</div>
+                <p>還沒有生字喔～<br>快來新增吧！</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 編輯模態框 -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <h3>✏️ 編輯生字</h3>
+            <input type="text" id="editInput" maxlength="20">
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeEditModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveEdit()">儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 刪除確認模態框 -->
+    <div class="modal confirm-modal" id="deleteModal">
+        <div class="modal-content">
+            <h3>🗑️ 確認刪除</h3>
+            <p>確定要刪除「<span id="deleteWordName"></span>」嗎？</p>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">取消</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">刪除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示訊息 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // 資料存儲
+        let words = JSON.parse(localStorage.getItem('learningWords')) || [];
+        let currentMode = 'manual';
+        let editingIndex = -1;
+        let deletingIndex = -1;
+        let currentRandomIndex = -1;
+
+        // 觸控滑動變數
+        let touchStartX = 0;
+        let touchEndX = 0;
+        let longPressTimer = null;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCards();
+            updateStats();
+
+            // 按Enter鍵新增
+            document.getElementById('wordInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addWord();
+            });
+
+            document.getElementById('editInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') saveEdit();
+            });
+
+            // 設置隨機區域的滑動事件
+            setupSwipeEvents(document.getElementById('randomDisplay'));
+        });
+
+        // 設置輸入標籤頁
+        function setInputTab(tab) {
+            document.querySelectorAll('.input-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.input-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'single') {
+                document.querySelector('.input-tab:first-child').classList.add('active');
+                document.getElementById('singlePanel').classList.add('active');
+            } else {
+                document.querySelector('.input-tab:last-child').classList.add('active');
+                document.getElementById('batchPanel').classList.add('active');
+            }
+        }
+
+        // 單個新增
+        function addWord() {
+            const input = document.getElementById('wordInput');
+            const word = input.value.trim();
+
+            if (!word) {
+                showToast('⚠️ 請輸入字詞！');
+                return;
+            }
+
+            if (words.includes(word)) {
+                showToast('⚠️ 已存在！');
+                return;
+            }
+
+            words.push(word);
+            saveWords();
+            input.value = '';
+            renderCards();
+            updateStats();
+            showToast('✅ 新增成功！');
+        }
+
+        // 批量新增
+        function addBatchWords() {
+            const textarea = document.getElementById('batchInput');
+            const text = textarea.value.trim();
+
+            if (!text) {
+                showToast('⚠️ 請輸入字詞！');
+                return;
+            }
+
+            // 支援換行或逗號分隔
+            let newWords = text.split(/[\n,，、]+/)
+                .map(w => w.trim())
+                .filter(w => w.length > 0);
+
+            if (newWords.length === 0) {
+                showToast('⚠️ 沒有有效的字詞！');
+                return;
+            }
+
+            let added = 0;
+            let duplicates = 0;
+
+            newWords.forEach(word => {
+                if (!words.includes(word)) {
+                    words.push(word);
+                    added++;
+                } else {
+                    duplicates++;
+                }
+            });
+
+            saveWords();
+            textarea.value = '';
+            renderCards();
+            updateStats();
+
+            if (duplicates > 0) {
+                showToast(`✅ 新增 ${added} 個，${duplicates} 個重複`);
+            } else {
+                showToast(`✅ 新增 ${added} 個生字！`);
+            }
+        }
+
+        // 設定模式
+        function setMode(mode) {
+            currentMode = mode;
+
+            document.getElementById('manualMode').classList.toggle('active', mode === 'manual');
+            document.getElementById('randomMode').classList.toggle('active', mode === 'random');
+
+            const randomDisplay = document.getElementById('randomDisplay');
+            const cardsContainer = document.getElementById('cardsContainer');
+            const quickHint = document.getElementById('quickHint');
+
+            if (mode === 'random') {
+                randomDisplay.classList.add('show');
+                cardsContainer.style.display = 'none';
+                quickHint.style.display = 'none';
+                nextRandom();
+            } else {
+                randomDisplay.classList.remove('show');
+                cardsContainer.style.display = 'grid';
+                quickHint.style.display = 'block';
+            }
+        }
+
+        // 設置滑動事件
+        function setupSwipeEvents(element) {
+            element.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            element.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+        }
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    nextRandom(); // 左滑 = 下一個
+                } else {
+                    prevRandom(); // 右滑 = 上一個
+                }
+            }
+        }
+
+        // 隨機導航
+        function nextRandom() {
+            if (words.length === 0) {
+                document.getElementById('randomWord').textContent = '無生字';
+                return;
+            }
+
+            if (words.length === 1) {
+                currentRandomIndex = 0;
+            } else {
+                let newIndex;
+                do {
+                    newIndex = Math.floor(Math.random() * words.length);
+                } while (newIndex === currentRandomIndex);
+                currentRandomIndex = newIndex;
+            }
+
+            document.getElementById('randomWord').textContent = words[currentRandomIndex];
+        }
+
+        function prevRandom() {
+            if (words.length === 0) {
+                document.getElementById('randomWord').textContent = '無生字';
+                return;
+            }
+
+            currentRandomIndex = (currentRandomIndex - 1 + words.length) % words.length;
+            document.getElementById('randomWord').textContent = words[currentRandomIndex];
+        }
+
+        // 渲染卡片
+        function renderCards() {
+            const container = document.getElementById('cardsContainer');
+
+            if (words.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🎈</div>
+                        <p>還沒有生字喔～<br>快來新增吧！</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = words.map((word, index) => `
+                <div class="word-card" data-index="${index}" onclick="openEditModal(${index})">
+                    <div class="word-text">${word}</div>
+                    <div class="card-actions">
+                        <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); openEditModal(${index})">✏️</button>
+                        <button class="btn btn-danger btn-small" onclick="event.stopPropagation(); openDeleteModal(${index})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // 添加長按刪除功能
+            document.querySelectorAll('.word-card').forEach(card => {
+                card.addEventListener('touchstart', (e) => {
+                    longPressTimer = setTimeout(() => {
+                        const index = parseInt(card.dataset.index);
+                        openDeleteModal(index);
+                        navigator.vibrate && navigator.vibrate(50);
+                    }, 500);
+                }, { passive: true });
+
+                card.addEventListener('touchend', () => {
+                    clearTimeout(longPressTimer);
+                });
+
+                card.addEventListener('touchmove', () => {
+                    clearTimeout(longPressTimer);
+                });
+            });
+        }
+
+        // 更新統計
+        function updateStats() {
+            document.getElementById('wordCount').textContent = words.length;
+        }
+
+        // 儲存到localStorage
+        function saveWords() {
+            localStorage.setItem('learningWords', JSON.stringify(words));
+        }
+
+        // 編輯相關
+        function openEditModal(index) {
+            editingIndex = index;
+            document.getElementById('editInput').value = words[index];
+            document.getElementById('editModal').classList.add('show');
+            setTimeout(() => document.getElementById('editInput').focus(), 100);
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('show');
+            editingIndex = -1;
+        }
+
+        function saveEdit() {
+            const newWord = document.getElementById('editInput').value.trim();
+
+            if (!newWord) {
+                showToast('⚠️ 不能為空！');
+                return;
+            }
+
+            if (words.includes(newWord) && words[editingIndex] !== newWord) {
+                showToast('⚠️ 已存在！');
+                return;
+            }
+
+            words[editingIndex] = newWord;
+            saveWords();
+            renderCards();
+            closeEditModal();
+            showToast('✅ 編輯成功！');
+        }
+
+        // 刪除相關
+        function openDeleteModal(index) {
+            deletingIndex = index;
+            document.getElementById('deleteWordName').textContent = words[index];
+            document.getElementById('deleteModal').classList.add('show');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('show');
+            deletingIndex = -1;
+        }
+
+        function confirmDelete() {
+            words.splice(deletingIndex, 1);
+            saveWords();
+            renderCards();
+            updateStats();
+            closeDeleteModal();
+            showToast('✅ 刪除成功！');
+
+            if (currentMode === 'random') {
+                nextRandom();
+            }
+        }
+
+        // 點擊模態框背景關閉
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        });
+
+        // 顯示提示訊息
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 1800);
+        }
+    </script>
+</body>
+</html>
